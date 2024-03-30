@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:news_app/models/NewsHeadlinesModel.dart';
+import 'package:news_app/screens/categoryscreen.dart';
 import 'package:news_app/view_models/new_view_models.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,14 +13,20 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+enum FilterList { thetimesofindia, thehindu, Google_News }
+
 class _HomeScreenState extends State<HomeScreen> {
+  NewsViewModel newsViewModel = NewsViewModel();
+  FilterList? selectedMenu;
+  String name = 'the-times-of-india'; // Default news source
   late Future<NewsHeadlinesModel> _newsModelFuture;
   final format = DateFormat('MMMM dd, yyyy');
 
   @override
   void initState() {
     super.initState();
-    _newsModelFuture = NewsViewModel().fetchNewsChannelHeadLinesApi();
+    _newsModelFuture = newsViewModel
+        .fetchNewsChannelHeadLinesApi(name); // Fetch news with default source
   }
 
   @override
@@ -30,16 +37,63 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CategoryScreen()));
+          },
           icon: Image.asset(
             'images/iconn.png',
-            height: 30,
+            height: 30,color: Colors.red,
           ),
         ),
-        title: Text(
-          'News',
-          style: GoogleFonts.poppins(),
+        title: Row(children: [
+          Text(
+            'News',
+            style: GoogleFonts.poppins( fontSize: 28,
+              fontWeight: FontWeight.w600,),
+          ),
+          Text(
+            ' Time',
+            style:
+          TextStyle(
+            color: Colors.red,fontSize: 18,fontWeight: FontWeight.w500,backgroundColor: Colors.black38,letterSpacing: 5
+          )
+          )
+        ],
         ),
+        actions: [
+          PopupMenuButton(color: Colors.red.shade300,iconColor: Colors.red,
+            initialValue: selectedMenu,
+            onSelected: (FilterList item) {
+              if (item == FilterList.thetimesofindia) {
+                name = 'the-times-of-india';
+              } else if (item == FilterList.thehindu) {
+                name = 'the-hindu';
+              } else if (item == FilterList.Google_News) {
+                name = 'google-news-in';
+              }
+              setState(() {
+                selectedMenu = item;
+                _newsModelFuture = newsViewModel.fetchNewsChannelHeadLinesApi(
+                    name); // Fetch news with selected source
+              });
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<FilterList>>[
+              const PopupMenuItem<FilterList>(
+                value: FilterList.thehindu,
+                child: Text('The Hindu'),
+              ),
+              const PopupMenuItem<FilterList>(
+                value: FilterList.thetimesofindia,
+                child: Text('The Times of India'),
+              ),
+              const PopupMenuItem<FilterList>(
+                value: FilterList.Google_News,
+                child: Text('Google_News'),
+              )
+            ],
+          )
+        ],
       ),
       body: FutureBuilder<NewsHeadlinesModel>(
         future: _newsModelFuture,
@@ -96,8 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   );
                                 },
                                 errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.error_outline,
-                                        color: Colors.red),
+                                    Image.asset('images/not.png'),
                               ),
                             ),
                           ),
@@ -123,8 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        article.source?.name ??
-                                            '', // Display source
+                                        article.source?.name ?? '',
+                                        // Display source
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
