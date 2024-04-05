@@ -78,8 +78,9 @@ class Articles {
 class Source {
   String? id;
   String? name;
+  String? title;
 
-  Source({this.id, this.name});
+  Source({this.id, this.name, this.title});
 
   Source.fromJson(Map<String, dynamic> json) {
     id = json['id'];

@@ -7,7 +7,7 @@ import '../models/catgory_news_model.dart';
 
 class NewsRepository {
   Future<NewsHeadlinesModel> fetchNewsChannelHeadLinesApi(String name) async {
-    String url = 'https://newsapi.org/v2/top-headlines?sources=$name&apiKey=92a9e35f6b6f42fba5fdf9f8de8fbd84';
+    String url = 'Your Api';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -20,9 +20,6 @@ class NewsRepository {
       throw Exception('Error: $e');
     }
   }
-
-
-
   Future<category_news_model> fetchcategorynewsApi(String category) async {
     String url = 'https://newsapi.org/v2/everything?q=${category}&apiKey=92a9e35f6b6f42fba5fdf9f8de8fbd84';
     try {
